@@ -27,6 +27,7 @@ const MortgageCalculator: React.FC = () => {
     const [overpayment, setOverpayment] = useState(200);
     const [overpaymentDay, setOverpaymentDay] = useState(15);
     const [currency, setCurrency] = useState("USD");
+    const [view, setView] = useState<"Monthly" | "Daily">("Monthly"); // Toggle between views
     const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
 
     const handleCalculate = () => {
@@ -36,7 +37,8 @@ const MortgageCalculator: React.FC = () => {
             monthlyPayment,
             paymentDay,
             overpayment,
-            overpaymentDay
+            overpaymentDay,
+            view // Pass the selected view to the calculation logic
         );
         setSchedule(result);
     };
@@ -44,11 +46,12 @@ const MortgageCalculator: React.FC = () => {
     const currencySymbol = currencySymbols[currency];
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold text-black mb-4">
+        <div className="p-6 bg-white rounded-lg shadow-md text-black">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">
                 Mortgage Overpayment Calculator
             </h1>
             <div className="space-y-4">
+                {/* Currency Selector */}
                 <div>
                     <label className="block text-sm font-medium text-gray-800">
                         Currency
@@ -66,6 +69,7 @@ const MortgageCalculator: React.FC = () => {
                     </select>
                 </div>
 
+                {/* Loan Amount */}
                 <div>
                     <label className="block text-sm font-medium text-gray-800">
                         Loan Amount ({currencySymbol})
@@ -78,6 +82,7 @@ const MortgageCalculator: React.FC = () => {
                     />
                 </div>
 
+                {/* Annual Interest Rate */}
                 <div>
                     <label className="block text-sm font-medium text-gray-800">
                         Annual Interest Rate (%)
@@ -93,6 +98,7 @@ const MortgageCalculator: React.FC = () => {
                     />
                 </div>
 
+                {/* Monthly Payment */}
                 <div>
                     <label className="block text-sm font-medium text-gray-800">
                         Regular Monthly Payment ({currencySymbol})
@@ -107,6 +113,7 @@ const MortgageCalculator: React.FC = () => {
                     />
                 </div>
 
+                {/* Payment Day */}
                 <div>
                     <label className="block text-sm font-medium text-gray-800">
                         Payment Day of Month
@@ -121,6 +128,7 @@ const MortgageCalculator: React.FC = () => {
                     />
                 </div>
 
+                {/* Overpayment Amount */}
                 <div>
                     <label className="block text-sm font-medium text-gray-800">
                         Overpayment Amount ({currencySymbol})
@@ -133,6 +141,7 @@ const MortgageCalculator: React.FC = () => {
                     />
                 </div>
 
+                {/* Overpayment Day */}
                 <div>
                     <label className="block text-sm font-medium text-gray-800">
                         Overpayment Day of Month
@@ -149,6 +158,24 @@ const MortgageCalculator: React.FC = () => {
                     />
                 </div>
 
+                {/* View Toggle */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-800">
+                        View Options
+                    </label>
+                    <select
+                        value={view}
+                        onChange={(e) =>
+                            setView(e.target.value as "Monthly" | "Daily")
+                        }
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    >
+                        <option value="Monthly">Monthly Breakdown</option>
+                        <option value="Daily">Daily Breakdown</option>
+                    </select>
+                </div>
+
+                {/* Calculate Button */}
                 <button
                     onClick={handleCalculate}
                     className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
@@ -157,51 +184,59 @@ const MortgageCalculator: React.FC = () => {
                 </button>
             </div>
 
+            {/* Payment Schedule Table */}
             {schedule.length > 0 && (
-                <div className="mt-6 text-black">
-                    <h2 className="text-xl font-bold">Payment Schedule</h2>
-                    <table className="min-w-full mt-2 border-collapse border border-gray-300">
-                        <thead>
-                            <tr>
-                                <th className="border border-gray-300 px-4 py-2">
-                                    Date
-                                </th>
-                                <th className="border border-gray-300 px-4 py-2">
-                                    Start Balance ({currencySymbol})
-                                </th>
-                                <th className="border border-gray-300 px-4 py-2">
-                                    Interest Earned ({currencySymbol})
-                                </th>
-                                <th className="border border-gray-300 px-4 py-2">
-                                    Payment ({currencySymbol})
-                                </th>
-                                <th className="border border-gray-300 px-4 py-2">
-                                    End Balance ({currencySymbol})
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {schedule.map((row, index) => (
-                                <tr key={index}>
-                                    <td className="border border-gray-300 px-4 py-2">
-                                        {row.date}
-                                    </td>
-                                    <td className="border border-gray-300 px-4 py-2">
-                                        {row.startBalance.toFixed(2)}
-                                    </td>
-                                    <td className="border border-gray-300 px-4 py-2">
-                                        {row.interest.toFixed(2)}
-                                    </td>
-                                    <td className="border border-gray-300 px-4 py-2">
-                                        {row.payment.toFixed(2)}
-                                    </td>
-                                    <td className="border border-gray-300 px-4 py-2">
-                                        {row.endBalance.toFixed(2)}
-                                    </td>
+                <div className="mt-6">
+                    <h2 className="text-xl font-bold">
+                        {view} Payment Schedule
+                    </h2>
+                    <div
+                        className="overflow-y-auto max-h-screen border border-gray-300 rounded-md"
+                        style={{ maxHeight: "75vh" }}
+                    >
+                        <table className="min-w-full border-collapse">
+                            <thead className="bg-gray-50 sticky top-0 z-10">
+                                <tr>
+                                    <th className="border border-gray-300 px-4 py-2">
+                                        Date
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2">
+                                        Start Balance ({currencySymbol})
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2">
+                                        Interest Earned ({currencySymbol})
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2">
+                                        Payment ({currencySymbol})
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2">
+                                        End Balance ({currencySymbol})
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {schedule.map((row, index) => (
+                                    <tr key={index}>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {row.date}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {row.startBalance.toFixed(2)}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {row.interest.toFixed(2)}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {row.payment.toFixed(2)}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {row.endBalance.toFixed(2)}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
         </div>
