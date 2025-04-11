@@ -9,7 +9,7 @@ export const calculateMortgageSchedule = (
 ) => {
     const schedule = [];
     let currentBalance = loanAmount;
-    let currentDate = new Date();
+    const currentDate = new Date();
 
     const dailyInterestRate = (interestRate / 100) / 365;
 
