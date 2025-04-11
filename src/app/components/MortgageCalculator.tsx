@@ -45,6 +45,10 @@ const MortgageCalculator: React.FC = () => {
 
     const currencySymbol = currencySymbols[currency];
 
+    const currencyFormat = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: currency,
+    });
     return (
         <div className="p-6 bg-white rounded-lg shadow-md text-black">
             <h1 className="text-2xl font-bold text-gray-800 mb-4">
@@ -221,7 +225,9 @@ const MortgageCalculator: React.FC = () => {
                                             {row.date}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2">
-                                            {row.startBalance.toFixed(2)}
+                                            {currencyFormat.format(
+                                                row.startBalance
+                                            )}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2">
                                             {row.interest.toFixed(2)}
@@ -230,7 +236,9 @@ const MortgageCalculator: React.FC = () => {
                                             {row.payment.toFixed(2)}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2">
-                                            {row.endBalance.toFixed(2)}
+                                            {currencyFormat.format(
+                                                row.endBalance
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
