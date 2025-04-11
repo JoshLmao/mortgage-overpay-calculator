@@ -3,25 +3,31 @@
 import React, { useState } from "react";
 import { calculateMortgageSchedule } from "../utils/mortgageUtils";
 
-interface MortgageCalculatorProps {}
+interface ScheduleEntry {
+    date: string;
+    startBalance: number;
+    interest: number;
+    payment: number;
+    endBalance: number;
+}
 
-const MortgageCalculator: React.FC<MortgageCalculatorProps> = () => {
+const currencySymbols: { [key: string]: string } = {
+    USD: "$",
+    GBP: "£",
+    EUR: "€",
+    JPY: "¥",
+    AUD: "A$",
+};
+
+const MortgageCalculator: React.FC = () => {
     const [loanAmount, setLoanAmount] = useState(300000); // Example default
     const [interestRate, setInterestRate] = useState(3.5); // Annual interest rate
     const [monthlyPayment, setMonthlyPayment] = useState(1500);
     const [paymentDay, setPaymentDay] = useState(1);
     const [overpayment, setOverpayment] = useState(200);
     const [overpaymentDay, setOverpaymentDay] = useState(15);
-
-    const [schedule, setSchedule] = useState<
-        {
-            date: string;
-            startBalance: number;
-            interest: number;
-            payment: number;
-            endBalance: number;
-        }[]
-    >([]);
+    const [currency, setCurrency] = useState("USD");
+    const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
 
     const handleCalculate = () => {
         const result = calculateMortgageSchedule(
@@ -35,15 +41,34 @@ const MortgageCalculator: React.FC<MortgageCalculatorProps> = () => {
         setSchedule(result);
     };
 
+    const currencySymbol = currencySymbols[currency];
+
     return (
         <div className="p-6 bg-white rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-4 text-black">
+            <h1 className="text-2xl font-bold text-black mb-4">
                 Mortgage Overpayment Calculator
             </h1>
             <div className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Loan Amount
+                    <label className="block text-sm font-medium text-gray-800">
+                        Currency
+                    </label>
+                    <select
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    >
+                        {Object.keys(currencySymbols).map((key) => (
+                            <option key={key} value={key}>
+                                {key}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-800">
+                        Loan Amount ({currencySymbol})
                     </label>
                     <input
                         type="number"
@@ -54,7 +79,7 @@ const MortgageCalculator: React.FC<MortgageCalculatorProps> = () => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-800">
                         Annual Interest Rate (%)
                     </label>
                     <input
@@ -69,8 +94,8 @@ const MortgageCalculator: React.FC<MortgageCalculatorProps> = () => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Regular Monthly Payment
+                    <label className="block text-sm font-medium text-gray-800">
+                        Regular Monthly Payment ({currencySymbol})
                     </label>
                     <input
                         type="number"
@@ -83,7 +108,7 @@ const MortgageCalculator: React.FC<MortgageCalculatorProps> = () => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-800">
                         Payment Day of Month
                     </label>
                     <input
@@ -97,8 +122,8 @@ const MortgageCalculator: React.FC<MortgageCalculatorProps> = () => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Overpayment Amount
+                    <label className="block text-sm font-medium text-gray-800">
+                        Overpayment Amount ({currencySymbol})
                     </label>
                     <input
                         type="number"
@@ -109,7 +134,7 @@ const MortgageCalculator: React.FC<MortgageCalculatorProps> = () => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-800">
                         Overpayment Day of Month
                     </label>
                     <input
@@ -142,16 +167,16 @@ const MortgageCalculator: React.FC<MortgageCalculatorProps> = () => {
                                     Date
                                 </th>
                                 <th className="border border-gray-300 px-4 py-2">
-                                    Start Balance
+                                    Start Balance ({currencySymbol})
                                 </th>
                                 <th className="border border-gray-300 px-4 py-2">
-                                    Interest
+                                    Interest Earned ({currencySymbol})
                                 </th>
                                 <th className="border border-gray-300 px-4 py-2">
-                                    Payment
+                                    Payment ({currencySymbol})
                                 </th>
                                 <th className="border border-gray-300 px-4 py-2">
-                                    End Balance
+                                    End Balance ({currencySymbol})
                                 </th>
                             </tr>
                         </thead>
