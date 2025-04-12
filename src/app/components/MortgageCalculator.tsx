@@ -54,7 +54,10 @@ const MortgageCalculator: React.FC = () => {
     };
 
     const currencySymbol = currencySymbols[currency];
-
+    const currencyFormat = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: currency,
+    });
     return (
         <Container>
             <Stack gap="lg">
@@ -153,7 +156,7 @@ const MortgageCalculator: React.FC = () => {
             {schedule.length > 0 && (
                 <Stack gap="md" mt="lg">
                     <Title order={3}>{view} Payment Schedule</Title>
-                    <ScrollArea style={{ maxHeight: "100vh" }}>
+                    <ScrollArea h={"70vh"}>
                         <Table
                             striped
                             highlightOnHover
@@ -173,10 +176,24 @@ const MortgageCalculator: React.FC = () => {
                                 {schedule.map((row, index) => (
                                     <tr key={index}>
                                         <td>{row.date}</td>
-                                        <td>{row.startBalance.toFixed(2)}</td>
-                                        <td>{row.interest.toFixed(2)}</td>
-                                        <td>{row.payment.toFixed(2)}</td>
-                                        <td>{row.endBalance.toFixed(2)}</td>
+                                        <td>
+                                            {currencyFormat.format(
+                                                row.startBalance
+                                            )}
+                                        </td>
+                                        <td>
+                                            {currencyFormat.format(
+                                                row.interest
+                                            )}
+                                        </td>
+                                        <td>
+                                            {currencyFormat.format(row.payment)}
+                                        </td>
+                                        <td>
+                                            {currencyFormat.format(
+                                                row.endBalance
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
