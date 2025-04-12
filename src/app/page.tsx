@@ -1,4 +1,5 @@
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 
 import Head from "next/head";
 import MortgageCalculator from "./components/MortgageCalculator";

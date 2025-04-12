@@ -10,11 +10,14 @@ import {
     Table,
     ScrollArea,
     Title,
+    InputLabel,
 } from "@mantine/core";
 import { calculateMortgageSchedule } from "../utils/mortgageUtils";
+import { Calendar } from "@mantine/dates";
+import dayjs from "dayjs";
 
 interface ScheduleEntry {
-    date: string;
+    date: dayjs.Dayjs;
     startBalance: number;
     interest: number;
     payment: number;
@@ -39,6 +42,9 @@ const MortgageCalculator: React.FC = () => {
     const [currency, setCurrency] = useState("USD");
     const [view, setView] = useState<"Monthly" | "Daily">("Monthly"); // Toggle between views
     const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
+    const [startDate, setStartDate] = useState(dayjs());
+
+    console.log(startDate);
 
     const handleCalculate = () => {
         const result = calculateMortgageSchedule(
@@ -48,6 +54,7 @@ const MortgageCalculator: React.FC = () => {
             paymentDay,
             overpayment,
             overpaymentDay,
+            startDate,
             view // Pass the selected view to the calculation logic
         );
         setSchedule(result);
@@ -132,6 +139,26 @@ const MortgageCalculator: React.FC = () => {
                     max={28}
                 />
 
+                {/* Mortgage start date picker */}
+                <div>
+                    <InputLabel>Mortgage Start Date</InputLabel>
+                    <Calendar
+                        getDayProps={(date: Date) => {
+                            const one = dayjs(date);
+                            console.log("prop day " + one);
+                            const two = dayjs(startDate);
+                            console.log("state day " + startDate);
+                            return {
+                                selected: one.isSame(two, "day"),
+                                onClick: () => {
+                                    console.log(date + " selected");
+                                    setStartDate(dayjs(date));
+                                },
+                            };
+                        }}
+                    />
+                </div>
+
                 {/* View Toggle */}
                 <Select
                     label="View Options"
@@ -175,7 +202,7 @@ const MortgageCalculator: React.FC = () => {
                             <tbody>
                                 {schedule.map((row, index) => (
                                     <tr key={index}>
-                                        <td>{row.date}</td>
+                                        <td>{row.date.toString()}</td>
                                         <td>
                                             {currencyFormat.format(
                                                 row.startBalance

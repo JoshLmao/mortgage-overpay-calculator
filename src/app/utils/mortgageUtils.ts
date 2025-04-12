@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const calculateMortgageSchedule = (
     loanAmount: number,
     interestRate: number,
@@ -5,11 +7,12 @@ export const calculateMortgageSchedule = (
     paymentDay: number,
     overpayment: number,
     overpaymentDay: number,
+    startDate: dayjs.Dayjs,
     view: "Monthly" | "Daily" // New parameter to handle view toggle
 ) => {
     const schedule = [];
     let currentBalance = loanAmount;
-    const currentDate = new Date();
+    let currentDate = startDate;
 
     const dailyInterestRate = (interestRate / 100) / 365;
 
@@ -20,7 +23,7 @@ export const calculateMortgageSchedule = (
             const monthlyInterest = (currentBalance * (interestRate / 100)) / 12;
 
             let payment = monthlyPayment;
-            if (currentDate.getDate() === overpaymentDay) {
+            if (currentDate.date() === overpaymentDay) {
                 payment += overpayment;
             }
 
@@ -28,7 +31,7 @@ export const calculateMortgageSchedule = (
             const endBalance = startBalance + monthlyInterest - totalPayment;
 
             schedule.push({
-                date: currentDate.toISOString().split("T")[0],
+                date: dayjs(currentDate),
                 startBalance,
                 interest: monthlyInterest,
                 payment: totalPayment,
@@ -36,7 +39,7 @@ export const calculateMortgageSchedule = (
             });
 
             currentBalance = endBalance;
-            currentDate.setMonth(currentDate.getMonth() + 1);
+            currentDate = currentDate.month(currentDate.month() + 1);
         }
     }
 
@@ -47,10 +50,10 @@ export const calculateMortgageSchedule = (
             const interestEarned = currentBalance * dailyInterestRate;
 
             let payment = 0;
-            if (currentDate.getDate() === paymentDay) {
+            if (currentDate.date() === paymentDay) {
                 payment += monthlyPayment;
             }
-            if (currentDate.getDate() === overpaymentDay) {
+            if (currentDate.date() === overpaymentDay) {
                 payment += overpayment;
             }
 
@@ -58,7 +61,7 @@ export const calculateMortgageSchedule = (
             const endBalance = startBalance + interestEarned - totalPayment;
 
             schedule.push({
-                date: currentDate.toISOString().split("T")[0],
+                date: dayjs(currentDate),
                 startBalance,
                 interest: interestEarned,
                 payment: totalPayment,
@@ -66,7 +69,7 @@ export const calculateMortgageSchedule = (
             });
 
             currentBalance = endBalance;
-            currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
+            currentDate = currentDate.date(currentDate.date() + 1); // Move to the next day
         }
     }
 
