@@ -1,6 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import {
+    Container,
+    Stack,
+    Select,
+    NumberInput,
+    Button,
+    Table,
+    ScrollArea,
+    Title,
+} from "@mantine/core";
 import { calculateMortgageSchedule } from "../utils/mortgageUtils";
 
 interface ScheduleEntry {
@@ -45,209 +55,136 @@ const MortgageCalculator: React.FC = () => {
 
     const currencySymbol = currencySymbols[currency];
 
-    const currencyFormat = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: currency,
-    });
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md text-black">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">
-                Mortgage Repayment Breakdown
-            </h1>
-            <div className="space-y-4">
+        <Container>
+            <Stack gap="lg">
+                <Title order={2}>Mortgage Overpayment Calculator</Title>
+
                 {/* Currency Selector */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-800">
-                        Currency
-                    </label>
-                    <select
-                        value={currency}
-                        onChange={(e) => setCurrency(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    >
-                        {Object.keys(currencySymbols).map((key) => (
-                            <option key={key} value={key}>
-                                {key}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                <Select
+                    label="Currency"
+                    placeholder="Select a currency"
+                    data={Object.keys(currencySymbols).map((key) => ({
+                        value: key,
+                        label: `${key} (${currencySymbols[key]})`,
+                    }))}
+                    value={currency}
+                    onChange={(value) => setCurrency(value || "USD")}
+                />
 
                 {/* Loan Amount */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-800">
-                        Loan Amount ({currencySymbol})
-                    </label>
-                    <input
-                        type="number"
-                        value={loanAmount}
-                        onChange={(e) => setLoanAmount(Number(e.target.value))}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                </div>
+                <NumberInput
+                    label={`Loan Amount (${currencySymbol})`}
+                    placeholder="Enter loan amount"
+                    value={loanAmount}
+                    onChange={(value) => setLoanAmount(Number(value) || 0)}
+                    min={0}
+                />
 
                 {/* Annual Interest Rate */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-800">
-                        Annual Interest Rate (%)
-                    </label>
-                    <input
-                        type="number"
-                        step="0.01"
-                        value={interestRate}
-                        onChange={(e) =>
-                            setInterestRate(Number(e.target.value))
-                        }
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                </div>
+                <NumberInput
+                    label="Annual Interest Rate (%)"
+                    placeholder="Enter interest rate"
+                    value={interestRate}
+                    onChange={(value) => setInterestRate(Number(value) || 0)}
+                    min={0}
+                    step={0.1}
+                />
 
                 {/* Monthly Payment */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-800">
-                        Regular Monthly Payment ({currencySymbol})
-                    </label>
-                    <input
-                        type="number"
-                        value={monthlyPayment}
-                        onChange={(e) =>
-                            setMonthlyPayment(Number(e.target.value))
-                        }
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                </div>
+                <NumberInput
+                    label={`Regular Monthly Payment (${currencySymbol})`}
+                    placeholder="Enter monthly payment"
+                    value={monthlyPayment}
+                    onChange={(value) => setMonthlyPayment(Number(value) || 0)}
+                    min={0}
+                />
 
                 {/* Payment Day */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-800">
-                        Payment Day of Month
-                    </label>
-                    <input
-                        type="number"
-                        min="1"
-                        max="28"
-                        value={paymentDay}
-                        onChange={(e) => setPaymentDay(Number(e.target.value))}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                </div>
+                <NumberInput
+                    label="Payment Day of Month"
+                    placeholder="Enter payment day"
+                    value={paymentDay}
+                    onChange={(value) => setPaymentDay(Number(value) || 1)}
+                    min={1}
+                    max={28}
+                />
 
                 {/* Overpayment Amount */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-800">
-                        Overpayment Amount ({currencySymbol})
-                    </label>
-                    <input
-                        type="number"
-                        value={overpayment}
-                        onChange={(e) => setOverpayment(Number(e.target.value))}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                </div>
+                <NumberInput
+                    label={`Overpayment Amount (${currencySymbol})`}
+                    placeholder="Enter overpayment amount"
+                    value={overpayment}
+                    onChange={(value) => setOverpayment(Number(value) || 0)}
+                    min={0}
+                />
 
                 {/* Overpayment Day */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-800">
-                        Overpayment Day of Month
-                    </label>
-                    <input
-                        type="number"
-                        min="1"
-                        max="28"
-                        value={overpaymentDay}
-                        onChange={(e) =>
-                            setOverpaymentDay(Number(e.target.value))
-                        }
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                </div>
+                <NumberInput
+                    label="Overpayment Day of Month"
+                    placeholder="Enter overpayment day"
+                    value={overpaymentDay}
+                    onChange={(value) => setOverpaymentDay(Number(value) || 1)}
+                    min={1}
+                    max={28}
+                />
 
                 {/* View Toggle */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-800">
-                        View Options
-                    </label>
-                    <select
-                        value={view}
-                        onChange={(e) =>
-                            setView(e.target.value as "Monthly" | "Daily")
-                        }
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    >
-                        <option value="Monthly">Monthly Breakdown</option>
-                        <option value="Daily">Daily Breakdown</option>
-                    </select>
-                </div>
+                <Select
+                    label="View Options"
+                    placeholder="Select view"
+                    data={[
+                        { value: "Monthly", label: "Monthly Breakdown" },
+                        { value: "Daily", label: "Daily Breakdown" },
+                    ]}
+                    value={view}
+                    onChange={(value) =>
+                        setView((value as "Monthly" | "Daily") || "Monthly")
+                    }
+                />
 
                 {/* Calculate Button */}
-                <button
-                    onClick={handleCalculate}
-                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
-                >
+                <Button fullWidth onClick={handleCalculate}>
                     Calculate Schedule
-                </button>
-            </div>
+                </Button>
+            </Stack>
 
             {/* Payment Schedule Table */}
             {schedule.length > 0 && (
-                <div className="mt-6">
-                    <h2 className="text-xl font-bold">
-                        {view} Payment Schedule
-                    </h2>
-                    <div
-                        className="overflow-y-auto max-h-screen border border-gray-300 rounded-md"
-                        style={{ maxHeight: "75vh" }}
-                    >
-                        <table className="min-w-full border-collapse">
+                <Stack gap="md" mt="lg">
+                    <Title order={3}>{view} Payment Schedule</Title>
+                    <ScrollArea style={{ maxHeight: "100vh" }}>
+                        <Table
+                            striped
+                            highlightOnHover
+                            withTableBorder
+                            withColumnBorders
+                        >
                             <thead className="bg-gray-50 sticky top-0 z-10">
                                 <tr>
-                                    <th className="border border-gray-300 px-4 py-2">
-                                        Date
-                                    </th>
-                                    <th className="border border-gray-300 px-4 py-2">
-                                        Start Balance ({currencySymbol})
-                                    </th>
-                                    <th className="border border-gray-300 px-4 py-2">
-                                        Interest Earned ({currencySymbol})
-                                    </th>
-                                    <th className="border border-gray-300 px-4 py-2">
-                                        Payment ({currencySymbol})
-                                    </th>
-                                    <th className="border border-gray-300 px-4 py-2">
-                                        End Balance ({currencySymbol})
-                                    </th>
+                                    <th>Date</th>
+                                    <th>Start Balance ({currencySymbol})</th>
+                                    <th>Interest Earned ({currencySymbol})</th>
+                                    <th>Payment ({currencySymbol})</th>
+                                    <th>End Balance ({currencySymbol})</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {schedule.map((row, index) => (
                                     <tr key={index}>
-                                        <td className="border border-gray-300 px-4 py-2">
-                                            {row.date}
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-2">
-                                            {currencyFormat.format(
-                                                row.startBalance
-                                            )}
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-2">
-                                            {row.interest.toFixed(2)}
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-2">
-                                            {row.payment.toFixed(2)}
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-2">
-                                            {currencyFormat.format(
-                                                row.endBalance
-                                            )}
-                                        </td>
+                                        <td>{row.date}</td>
+                                        <td>{row.startBalance.toFixed(2)}</td>
+                                        <td>{row.interest.toFixed(2)}</td>
+                                        <td>{row.payment.toFixed(2)}</td>
+                                        <td>{row.endBalance.toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>
-                        </table>
-                    </div>
-                </div>
+                        </Table>
+                    </ScrollArea>
+                </Stack>
             )}
-        </div>
+        </Container>
     );
 };
 
