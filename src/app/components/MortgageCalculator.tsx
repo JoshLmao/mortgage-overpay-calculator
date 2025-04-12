@@ -44,8 +44,6 @@ const MortgageCalculator: React.FC = () => {
     const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
     const [startDate, setStartDate] = useState(dayjs());
 
-    console.log(startDate);
-
     const handleCalculate = () => {
         const result = calculateMortgageSchedule(
             loanAmount,
@@ -65,6 +63,7 @@ const MortgageCalculator: React.FC = () => {
         style: "currency",
         currency: currency,
     });
+    const dayFormat = "DD/MM/YYYY";
     return (
         <Container>
             <Stack gap="lg">
@@ -144,14 +143,12 @@ const MortgageCalculator: React.FC = () => {
                     <InputLabel>Mortgage Start Date</InputLabel>
                     <Calendar
                         getDayProps={(date: Date) => {
-                            const one = dayjs(date);
-                            console.log("prop day " + one);
-                            const two = dayjs(startDate);
-                            console.log("state day " + startDate);
                             return {
-                                selected: one.isSame(two, "day"),
+                                selected: dayjs(date).isSame(
+                                    dayjs(startDate),
+                                    "day"
+                                ),
                                 onClick: () => {
-                                    console.log(date + " selected");
                                     setStartDate(dayjs(date));
                                 },
                             };
@@ -192,7 +189,7 @@ const MortgageCalculator: React.FC = () => {
                         >
                             <thead className="bg-gray-50 sticky top-0 z-10">
                                 <tr>
-                                    <th>Date</th>
+                                    <th>Date ({dayFormat})</th>
                                     <th>Start Balance ({currencySymbol})</th>
                                     <th>Interest Earned ({currencySymbol})</th>
                                     <th>Payment ({currencySymbol})</th>
@@ -202,7 +199,7 @@ const MortgageCalculator: React.FC = () => {
                             <tbody>
                                 {schedule.map((row, index) => (
                                     <tr key={index}>
-                                        <td>{row.date.toString()}</td>
+                                        <td>{row.date.format(dayFormat)}</td>
                                         <td>
                                             {currencyFormat.format(
                                                 row.startBalance
